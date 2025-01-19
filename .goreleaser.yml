@@ -1,0 +1,46 @@
+project_name: bluerestd
+version: 2
+
+builds:
+  - main: ./cmd/cli/
+    env:
+      - CGO_ENABLED=0
+      - GO111MODULE=on
+      - GOPROXY=https://proxy.golang.org
+
+    ldflags:
+      - -s -w -X github.com/bluetuith-org/bluerestd/cmd/app.Version={{.Version}} -X github.com/bluetuith-org/bluerestd/cmd/app/app.Revision={{.ShortCommit}}
+
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+    targets:
+      - linux_amd64
+      - linux_386
+      - linux_arm64
+      - linux_arm_5
+      - linux_arm_6
+      - linux_arm_7
+      - windows_amd64
+      - windows_arm64
+      - windows_386
+
+archives:
+  - id: archive
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x64
+      {{- else if eq .Arch "386" }}x86
+      {{- else if eq .Arch "arm" }}{{ .Arch }}v{{ .Arm }}
+      {{- else }}{{ .Arch }}{{ end }}
+
+    files:
+      - LICENSE
+      - README.md
+      - CHANGELOG.md
+
+checksum:
+  name_template: 'checksums.txt'
+
+changelog:
+  disable: true
